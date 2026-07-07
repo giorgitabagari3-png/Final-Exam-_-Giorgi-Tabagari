@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPA Calculator - Ilia State University</title>
+    <style>
+        :root {
+            --primary-color: #0f4c81;
+            --secondary-color: #1a73e8;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --success-color: #2ec4b6;
+            --accent-color: #ff9f1c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-background);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        header {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .program-name {
+            font-size: 16px;
+            font-weight: 600;
+            background-color: #e8f0fe;
+            color: var(--secondary-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        /* Tooltip Style for Subtask 3 */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .info-icon {
+            cursor: pointer;
+            font-size: 18px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+            transition: background 0.2s;
+        }
+
+        .info-icon:hover {
+            background: #ddd;
+        }
+
+        .tooltip-box {
+            visibility: hidden;
+            width: 350px;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 15px;
+            position: absolute;
+            z-index: 10;
+            right: 0;
+            top: 35px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip-container:hover .tooltip-box,
+        .tooltip-container:focus-within .tooltip-box {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip-box h4 {
+            margin-top: 0;
+            color: #4fc3f7;
+            border-bottom: 1px solid #555;
+            padding-bottom: 5px;
+        }
+
+        /* Table Styling */
+        .table-wrapper {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f3f5;
+            color: var(--primary-color);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        tr:hover {
+            background-color: #fdfdfd;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-yes {
+            background-color: #e2f9f5;
+            color: #0e7a6e;
+        }
+
+        .badge-no {
+            background-color: #ffebe9;
+            color: #ce2c30;
+        }
+
+        /* Buttons & Actions */
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b3a63;
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background-color: #e08a10;
+        }
+
+        .btn-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 25px;
+            background: #fff9f0;
+            padding: 10px;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        /* Results Panel */
+        .results-panel {
+            background-color: #f4f7f6;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #d1dbd7;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .result-item {
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Academic Performance Dashboard</h1>
+            <span class="program-name">Academic Program: Civil Engineering</span>
+        </div>
+        
+        <div class="tooltip-container" id="gpa-info-tooltip">
+            <span class="info-icon" tabindex="0">ℹ️</span>
+            <div class="tooltip-box">
+                <h4>Iliauni GPA & Grading Regulations</h4>
+                <p><strong>Official Translation of Document 82542.pdf:</strong></p>
+                <p>According to Ilia State University academic evaluation rules, GPA is calculated based on the following grade points:</p>
+                <ul>
+                    <li>91–100 (A) Excellent: 4.0</li>
+                    <li>81–90 (B) Very Good: 3.0</li>
+                    <li>71–80 (C) Good: 2.0</li>
+                    <li>61–70 (D) Satisfactory: 1.0</li>
+                    <li>51–60 (E) Sufficient: 0.5</li>
+                    <li>&lt;51 (FX/F) Fail: 0.0</li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>course</th>
+                    <th>credit</th>
+                    <th>grade</th>
+                    <th>passed</th>
+                </tr>
+            </thead>
+            <tbody id="courses-table-body">
+                </tbody>
+        </table>
+    </div>
+
+    <div class="actions">
+        <button class="btn-primary" onclick="calculateStandardGPA()">Calculate</button>
+        <button class="btn-accent" onclick="calculateWithAIBonus()">Calculate with Introduction to AI</button>
+    </div>
+
+    <div class="btn-description">
+        This button assumes the final score for <strong>"Introduction to Artificial Intelligence (ENG)"</strong> equals current accumulated points + 30 final exam points, and recalculates the GPA.
+    </div>
+
+    <div class="results-panel">
+        <div class="result-item">
+            <div>Calculation Status</div>
+            <div class="result-value" id="gpa-status" style="font-size: 22px; color: #555;">Pending...</div>
+        </div>
+        <div class="result-item">
+            <div>Cumulative GPA</div>
+            <div class="result-value" id="gpa-display">0.00</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const transcriptData = [
+        { course: "Academic Techniques (ENG)", credit: 6, grade: 65.00, passed: "Yes" },
+        { course: "Calculus I (ENG)", credit: 6, grade: 100.00, passed: "Yes" },
+        { course: "Calculus II (ENG)", credit: 6, grade: 100.00, passed: "Yes" },
+        { course: "Calculus III (ENG)", credit: 6, grade: 98.50, passed: "Yes" },
+        { course: "English Language Course C1-1 (ENG)", credit: 6, grade: 80.00, passed: "Yes" },
+        { course: "English Language Course C1-2 (ENG)", credit: 6, grade: 72.20, passed: "Yes" },
+        { course: "Introduction to Modern Thought I (ENG)", credit: 6, grade: 85.00, passed: "Yes" },
+        { course: "Introduction to Modern Thought II (ENG)", credit: 6, grade: 68.00, passed: "Yes" },
+        { course: "Applied Hydraulics (Including Lab) (ENG)", credit: 8, grade: 95.00, passed: "Yes" },
+        { course: "Applied Mechanics (Statics) (ENG)", credit: 6, grade: 99.00, passed: "Yes" },
+        { course: "Applied mechanics II (Dynamics) (ENG)", credit: 6, grade: 100.00, passed: "Yes" },
+        { course: "Basics of Physics II (ENG)", credit: 6, grade: 100.00, passed: "Yes" },
+        { course: "Biology for Engineers (ENG)", credit: 6, grade: 95.10, passed: "Yes" },
+        { course: "Civil Engineering Computer Applications (GIS) (ENG)", credit: 6, grade: 98.00, passed: "Yes" },
+        { course: "Civil Engineering and Society (ENG)", credit: 2, grade: 0.00, passed: "No" },
+        { course: "Computer Graphics for the Built Environment (ENG)", credit: 6, grade: 87.00, passed: "Yes" },
+        { course: "Construction and Culture (ENG)", credit: 2, grade: 87.00, passed: "Yes" },
+        { course: "Design of Steel Structures (ENG)", credit: 6, grade: 0.00, passed: "No" },
+        { course: "Ecology - ecosystem (ENG)", credit: 8, grade: 98.00, passed: "Yes" },
+        { course: "Economic Thinking (ENG)", credit: 4, grade: 98.00, passed: "Yes" },
+        { course: "Entrepreneurship (ENG)", credit: 6, grade: 66.00, passed: "Yes" },
+        { course: "Environmental Engineering (ENG)", credit: 6, grade: 100.00, passed: "Yes" },
+        { course: "Fluid Mechanics (ENG)", credit: 6, grade: 95.00, passed: "Yes" },
+        { course: "Geotechnical Engineering (Including lab) (ENG)", credit: 8, grade: 97.00, passed: "Yes" },
+        { course: "Highway Engineering (ENG)", credit: 6, grade: 0.00, passed: "No" },
+        
+        // აქ შევცვალე 90.00-ზე და სტატუსი გადავიდა Yes-ზე
+        { course: "Introduction to Artificial Intelligence (ENG)", credit: 6, grade: 90.00, passed: "Yes" },
+        
+        { course: "Introduction to Civil Engineering (ENG)", credit: 2, grade: 90.00, passed: "Yes" },
+        { course: "Introduction to Engineering Materials (ENG)", credit: 6, grade: 89.00, passed: "Yes" },
+        { course: "Introduction to General Chemistry (ENG)", credit: 8, grade: 95.00, passed: "Yes" },
+        { course: "Introduction to Solid Mechanics (Including Lab) (ENG)", credit: 8, grade: 91.00, passed: "Yes" },
+        { course: "Introduction to Transportation Engineering (ENG)", credit: 6, grade: 96.00, passed: "Yes" },
+        { course: "Numerical Analysis (ENG)", credit: 6, grade: 91.00, passed: "Yes" },
+        { course: "Physics I including Lab (ENG)", credit: 8, grade: 98.75, passed: "Yes" },
+        { course: "Principles of Engineering Economy (ENG)", credit: 6, grade: 94.00, passed: "Yes" },
+        { course: "Probability and Statistics (ENG)", credit: 6, grade: 94.00, passed: "Yes" },
+        { course: "Project Management for Engineers (ENG)", credit: 4, grade: 0.00, passed: "No" },
+        { course: "Reinforced Concrete Design (ENG)", credit: 6, grade: 97.00, passed: "Yes" },
+        { course: "Senior Design Project Conception (ENG)", credit: 6, grade: 0.00, passed: "No" },
+        { course: "Soil Mechanics and Foundations (ENG)", credit: 6, grade: 100.00, passed: "Yes" },
+        { course: "Structural Analysis I (ENG)", credit: 6, grade: 98.00, passed: "Yes" },
+        { course: "Structural Analysis II (ENG)", credit: 6, grade: 96.00, passed: "Yes" },
+        { course: "Surveying for Civil Engineering and Construction (ENG)", credit: 6, grade: 100.00, passed: "Yes" },
+        { course: "Water Treatment Engineering (Incl. Wastewater) (ENG)", credit: 6, grade: 0.00, passed: "No" },
+
+        // 5 დამატებითი საგანი 100 ქულით
+        { course: "Advanced Structural Engineering (ENG)", credit: 6, grade: 100.00, passed: "Yes" },
+        { course: "Bridge Design and Analysis (ENG)", credit: 6, grade: 100.00, passed: "Yes" },
+        { course: "Construction Project Management (ENG)", credit: 6, grade: 100.00, passed: "Yes" },
+        { course: "Earthquake Engineering (ENG)", credit: 6, grade: 100.00, passed: "Yes" },
+        { course: "Urban Planning and Development (ENG)", credit: 6, grade: 100.00, passed: "Yes" }
+    ];
+
+    function getGradePoints(score) {
+        if (score >= 91) return 4.0;
+        if (score >= 81) return 3.0;
+        if (score >= 71) return 2.0;
+        if (score >= 61) return 1.0;
+        if (score >= 51) return 0.5;
+        return 0.0;
+    }
+
+    function renderTable(dataArray) {
+        const tableBody = document.getElementById("courses-table-body");
+        tableBody.innerHTML = "";
+
+        dataArray.forEach(item => {
+            const row = document.createElement("tr");
+            const badgeClass = item.passed === "Yes" ? "badge-yes" : "badge-no";
+            
+            row.innerHTML = `
+                <td><strong>${item.course}</strong></td>
+                <td>${item.credit}</td>
+                <td>${item.grade.toFixed(2)}</td>
+                <td><span class="badge ${badgeClass}">${item.passed}</span></td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function calculateGPA(dataArray) {
+        let totalPoints = 0;
+        let totalCredits = 0;
+
+        dataArray.forEach(item => {
+            if (item.credit > 0) {
+                const points = getGradePoints(item.grade);
+                totalPoints += points * item.credit;
+                totalCredits += item.credit;
+            }
+        });
+
+        return totalCredits === 0 ? 0 : (totalPoints / totalCredits);
+    }
+
+    function calculateStandardGPA() {
+        renderTable(transcriptData);
+        const finalGPA = calculateGPA(transcriptData);
+        document.getElementById("gpa-display").innerText = finalGPA.toFixed(2);
+        document.getElementById("gpa-status").innerText = "Standard Calculation";
+        document.getElementById("gpa-status").style.color = "var(--primary-color)";
+    }
+
+    function calculateWithAIBonus() {
+        const simulatedData = JSON.parse(JSON.stringify(transcriptData));
+
+        simulatedData.forEach(item => {
+            if (item.course === "Introduction to Artificial Intelligence (ENG)") {
+                item.grade = Math.min(item.grade + 30, 100); 
+                if (item.grade >= 51) {
+                    item.passed = "Yes";
+                }
+            }
+        });
+
+        renderTable(simulatedData);
+
+        const projectedGPA = calculateGPA(simulatedData);
+        document.getElementById("gpa-display").innerText = projectedGPA.toFixed(2);
+        document.getElementById("gpa-status").innerText = "Simulated (AI Bonus)";
+        document.getElementById("gpa-status").style.color = "var(--accent-color)";
+    }
+
+    window.onload = function() {
+        renderTable(transcriptData);
+    };
+</script>
+
+</body>
+</html>
